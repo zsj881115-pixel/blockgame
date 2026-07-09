@@ -71,7 +71,7 @@ h1{margin:0;font-size:22px;line-height:1.1;letter-spacing:.02em}
 .cell.preview-bad{outline:2px solid rgba(255,122,138,.96);outline-offset:-2px;filter:brightness(.80)}
 .cell.drop-flash{animation:flash .22s ease-out}
 .cell.board-placed{cursor:pointer;transition:filter .1s ease}
-.cell.board-placed:active{filter:brightness(1.25)}
+.cell.board-placed.held{filter:brightness(.82) saturate(.92);transform:translateZ(0) scale(.95);transition:filter .08s ease,transform .08s ease}
 @keyframes flash{0%{transform:scale(1.12);filter:brightness(1.35)}100%{transform:scale(1);filter:brightness(1)}}
 
 /* 过关动画 */
@@ -222,12 +222,12 @@ h1{margin:0;font-size:22px;line-height:1.1;letter-spacing:.02em}
   <section class="board-wrap">
     <div class="board-head">
       <div><span class="level-name" id="levelName">第一关</span> <span id="levelSize">6 × 6</span></div>
-      <div id="goalText">拖拽方块填满白色区域 · 双击已放方块可放回</div>
+      <div id="goalText">拖动方块填满白色区域 · 拖动已放方块可重摆 · 双击已放方块可放回</div>
     </div>
     <div class="board" id="board"></div>
   </section>
   <section class="tray-panel">
-    <div class="tray-title"><strong>方块区</strong><span>拖到白色区域放置 · 点击旋转 · 双击已放方块放回</span></div>
+    <div class="tray-title"><strong>方块区</strong><span>拖到白色区域放置 · 点击旋转 · 拖动已放方块可重摆 · 双击放回</span></div>
     <div class="tray" id="tray"></div>
   </section>
   <section class="controls">
@@ -629,6 +629,11 @@ h1{margin:0;font-size:22px;line-height:1.1;letter-spacing:.02em}
     if (source === "board" && pc.placed) {
       for (const [k, id] of [...st.occupied]) if (id === pc.id) st.occupied.delete(k);
       pc.placed = false;
+      const m0 = st.def.m || st.def.n;
+      cellsAt(pc, pc.row, pc.col).forEach(([r,c]) => {
+        const d = els.board.children[r*m0+c];
+        if (d) { d.classList.remove("filled","board-placed"); d.style.background = ""; }
+      });
     }
     const cellPx = 22;
     const ghost = document.createElement("div");
@@ -646,8 +651,13 @@ h1{margin:0;font-size:22px;line-height:1.1;letter-spacing:.02em}
       if (isTouch) gy -= gs.h + 24;
     }
     ghost.style.left = Math.round(gx) + "px"; ghost.style.top = Math.round(gy) + "px";
-    drag = { pc, ghost, source, startX:ev.clientX, startY:ev.clientY,
-              offsetX:ev.clientX-gx, offsetY:ev.clientY-gy, lastValid:null };
+    if (source === "board") {
+      ghost.style.transform = "scale(1.06)";
+      setTimeout(() => { if (ghost.isConnected) ghost.style.transform = "scale(1)"; }, 150);
+    }
+    drag = { pc, ghost, source, originRow: pc.row, originCol: pc.col, originRot: pc.rot,
+             startX:ev.clientX, startY:ev.clientY,
+             offsetX:ev.clientX-gx, offsetY:ev.clientY-gy, lastValid:null };
     ev.target.setPointerCapture(ev.pointerId);
     ev.target.addEventListener("pointermove", onMove);
     ev.target.addEventListener("pointerup", onUp);
@@ -673,6 +683,7 @@ h1{margin:0;font-size:22px;line-height:1.1;letter-spacing:.02em}
     if (!drag) return; ev.preventDefault();
     const pc = drag.pc, startX = drag.startX, startY = drag.startY;
     const lastValid = drag.lastValid;
+    const source = drag.source, originRow = drag.originRow, originCol = drag.originCol;
     const gx = parseFloat(drag.ghost.style.left)||0;
     const gy = parseFloat(drag.ghost.style.top)||0;
     drag.ghost.remove(); drag = null; clearPreview();
@@ -699,46 +710,72 @@ h1{margin:0;font-size:22px;line-height:1.1;letter-spacing:.02em}
       const found = findPlaceNear(pc, pos2.row, pos2.col, 2);
       if (found && place(pc, found.row, found.col)) { flashCells(cellsAt(pc, found.row, found.col)); return; }
     }
+    // 已放置方块被拎起后若无合法落点 → 掉回原位（重量感）
+    if (source === "board" && originRow !== null && originRow !== undefined &&
+        canPlace(pc, originRow, originCol)) {
+      if (place(pc, originRow, originCol)) { flashCells(cellsAt(pc, originRow, originCol)); return; }
+    }
     toast("拖到白色区域再松手"); render();
   }
 
-  // ── 棋盘交互：拖拽移动 / 单击旋转 / 双击放回 ──
-  let boardDrag = null;
+  // ── 棋盘交互：按下已放置方块 → 拖拽重放(带重量阈值) / 单击旋转 / 双击放回 ──
+  const LIFT_THRESHOLD = 12; // 拖动超过该距离才"拎起"已放置方块，营造重量感
   els.board.addEventListener("pointerdown", ev => {
     const cell = ev.target.closest(".cell");
     if (!cell || !cell.classList.contains("filled")) return;
     ev.preventDefault();
-    const r = parseInt(cell.dataset.r), c = parseInt(cell.dataset.c);
+    const r = parseInt(cell.dataset.r, 10), c = parseInt(cell.dataset.c, 10);
     const pcId = st.occupied.get(key(r, c));
     const pc = st.pieces.find(p => p.id === pcId);
     if (!pc) return;
-    boardDrag = { pc, startX:ev.clientX, startY:ev.clientY };
+    const startX = ev.clientX, startY = ev.clientY;
     cell.setPointerCapture(ev.pointerId);
+    cell.classList.add("held");
+    let lifted = false;
     const onMove = (e) => {
-      if (!boardDrag) return;
-      if (Math.hypot(e.clientX-boardDrag.startX, e.clientY-boardDrag.startY) > 6) {
-        const pc2 = boardDrag.pc; boardDrag = null;
-        cell.removeEventListener("pointermove", onMove); cell.removeEventListener("pointerup", onUp2);
-        cell.removeEventListener("pointercancel", onUp2);
-        startDrag(e, pc2, "board");
+      if (lifted) return;
+      if (Math.hypot(e.clientX - startX, e.clientY - startY) >= LIFT_THRESHOLD) {
+        lifted = true;
+        cell.classList.remove("held");
+        cell.removeEventListener("pointermove", onMove);
+        cell.removeEventListener("pointerup", onUp);
+        cell.removeEventListener("pointercancel", onUp);
+        startDrag(e, pc, "board");
       }
     };
-    const onUp2 = (e) => {
-      cell.removeEventListener("pointermove", onMove); cell.removeEventListener("pointerup", onUp2);
-      cell.removeEventListener("pointercancel", onUp2);
-      if (!boardDrag) return;
-      const pc2 = boardDrag.pc; boardDrag = null;
-      if (checkDoubleTap(pc2.id)) { unplace(pc2); toast("已放回"); return; }
+    const onUp = (e) => {
+      cell.classList.remove("held");
+      cell.removeEventListener("pointermove", onMove);
+      cell.removeEventListener("pointerup", onUp);
+      cell.removeEventListener("pointercancel", onUp);
+      if (lifted) return; // 已拎起，落子交由 drag.onUp 处理
+      if (e.type === "pointercancel") return; // 手势被系统中断，不触发旋转/放回
+      if (checkDoubleTap(pc.id)) { unplace(pc); toast("已放回"); return; }
       setTimeout(() => {
-        if (lastTap.id === pc2.id && Date.now() - lastTap.time < 350) return;
-        pc2.rot = (pc2.rot + 1) % 4; render();
-        if (isDone()) setTimeout(showWin, 220); toast("已旋转 90°");
+        if (lastTap.id === pc.id && Date.now() - lastTap.time < 350) return;
+        rotatePlacedInPlace(pc);
       }, 50);
     };
     cell.addEventListener("pointermove", onMove);
-    cell.addEventListener("pointerup", onUp2);
-    cell.addEventListener("pointercancel", onUp2);
+    cell.addEventListener("pointerup", onUp);
+    cell.addEventListener("pointercancel", onUp);
   });
+
+  // 原地旋转已放置方块：校验后仍可放下才旋转，否则提示
+  function rotatePlacedInPlace(pc) {
+    if (!pc.placed) { pc.rot = (pc.rot + 1) % 4; renderTray(); if (isDone()) setTimeout(showWin, 220); toast("已旋转 90°"); return; }
+    const newRot = (pc.rot + 1) % 4;
+    const n = st.def.n, m = st.def.m || n;
+    const fits = cellsAt(pc, pc.row, pc.col, newRot).every(([r,c]) => {
+      const k = key(r,c), occ = st.occupied.get(k);
+      return r>=0 && c>=0 && r<n && c<m && st.target.has(k) && (occ === undefined || occ === pc.id);
+    });
+    if (!fits) { toast("空间不够，原地转不动"); return; }
+    for (const [k, id] of [...st.occupied]) if (id === pc.id) st.occupied.delete(k);
+    cellsAt(pc, pc.row, pc.col, newRot).forEach(([r,c]) => st.occupied.set(key(r,c), pc.id));
+    pc.rot = newRot;
+    render(); if (isDone()) setTimeout(showWin, 220); toast("已旋转 90°");
+  }
 
   function checkDoubleTap(pcId) {
     const now = Date.now();
