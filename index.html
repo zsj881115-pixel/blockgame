@@ -23,10 +23,11 @@ body{overscroll-behavior:none;background:
 button{font:inherit;color:inherit}
 
 /* ═══ 开始页面 ═══ */
-.splash{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:
+.splash{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:0;background:
   radial-gradient(900px 620px at 50% 20%, rgba(91,168,255,.12), transparent 60%),
   radial-gradient(720px 640px at 50% 102%, rgba(155,123,255,.10), transparent 60%),
-  linear-gradient(180deg,#0a1018,#05080f);padding:32px 24px;transition:opacity .5s ease,visibility .5s ease}
+  linear-gradient(180deg,#0a1018,#05080f);padding:24px 24px max(12px,env(safe-area-inset-bottom));transition:opacity .5s ease,visibility .5s ease}
+.splash-main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;width:100%;padding:12px 0}
 .splash.hide{opacity:0;visibility:hidden;pointer-events:none}
 .splash-logo{font-size:72px;line-height:1;filter:drop-shadow(0 0 30px rgba(70,230,208,.45));margin-bottom:2px;animation:float 4.5s ease-in-out infinite}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
@@ -37,7 +38,7 @@ button{font:inherit;color:inherit}
 .splash-rules h3::before{content:"";width:18px;height:3px;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
 .splash-rules ol{margin:0;padding-left:22px;color:var(--muted);font-size:15px;line-height:2.3;letter-spacing:.01em}
 .splash-rules li::marker{color:var(--accent);font-weight:700}
-.splash-author{font-size:13px;color:rgba(255,255,255,.30);margin-top:2px;letter-spacing:.05em}
+.splash-author{font-size:13px;color:rgba(255,255,255,.30);letter-spacing:.05em;margin-bottom:4px}
 .splash-btn{margin-top:10px;padding:16px 58px;border:0;border-radius:999px;background:linear-gradient(135deg,#46e6d0,#5aa8ff);color:#04121a;font-size:19px;font-weight:800;letter-spacing:.10em;cursor:pointer;box-shadow:0 10px 30px rgba(70,230,208,.30),inset 0 1px 0 rgba(255,255,255,.35);transition:transform .15s ease,box-shadow .15s ease}
 .splash-btn:active{transform:scale(.96);box-shadow:0 4px 14px rgba(70,230,208,.22)}
 .splash-btn.secondary{background:rgba(255,255,255,.06);color:var(--text);border:1px solid var(--line);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
@@ -60,8 +61,8 @@ h1{margin:0;font-size:22px;line-height:1.1;letter-spacing:.02em}
 .board-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:11px;color:var(--muted);font-size:13.5px}
 .level-name{color:var(--text);font-weight:800;letter-spacing:.05em;font-size:16px;background:linear-gradient(120deg,#eaf2ff,#46e6d0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 
-.board{--n:6;width:min(calc(100vw - 52px),460px);aspect-ratio:1/1;margin:0 auto;display:grid;grid-template-columns:repeat(var(--n),1fr);grid-template-rows:repeat(var(--n),1fr);gap:var(--cell-gap);padding:var(--cell-gap);border-radius:18px;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(0,0,0,.18));border:1px solid rgba(255,255,255,.08);box-shadow:inset 0 2px 10px rgba(0,0,0,.4),inset 0 0 0 1px rgba(255,255,255,.04);position:relative;overflow:hidden;touch-action:none}
-.cell{border-radius:5px;background:linear-gradient(180deg,rgba(120,134,150,.85),rgba(86,98,116,.85));box-shadow:inset 0 0 0 1px rgba(255,255,255,.05),inset 0 -2px 4px rgba(0,0,0,.25);transition:transform .12s ease,filter .12s ease,background .15s ease}
+.board{--n:6;--m:6;width:min(calc(100vw - 52px),460px);aspect-ratio:var(--m)/var(--n);margin:0 auto;display:grid;grid-template-columns:repeat(var(--m),1fr);grid-template-rows:repeat(var(--n),1fr);gap:var(--cell-gap);padding:var(--cell-gap);border-radius:18px;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(0,0,0,.18));border:1px solid rgba(255,255,255,.08);box-shadow:inset 0 2px 10px rgba(0,0,0,.4),inset 0 0 0 1px rgba(255,255,255,.04);position:relative;overflow:hidden;touch-action:none;image-rendering:pixelated;-webkit-transform:translateZ(0);transform:translateZ(0)}
+.cell{border-radius:3px;background:linear-gradient(180deg,rgba(120,134,150,.90),rgba(86,98,116,.90));box-shadow:inset 0 0 0 1px rgba(255,255,255,.06),inset 0 -2px 4px rgba(0,0,0,.25);transition:transform .12s ease,filter .12s ease,background .15s ease;-webkit-backface-visibility:hidden;backface-visibility:hidden;-webkit-transform:translateZ(0);transform:translateZ(0)}
 .cell.target{background:linear-gradient(180deg,rgba(240,247,255,.96),rgba(214,228,246,.92));box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 -2px 6px rgba(120,150,190,.25),0 0 0 1px rgba(255,255,255,.5)}
 .cell.filled{box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 -3px 7px rgba(0,0,0,.28),0 2px 6px rgba(0,0,0,.25)}
 .cell.preview-ok{outline:2px solid rgba(122,240,192,.95);outline-offset:-2px;filter:brightness(1.10)}
@@ -153,9 +154,13 @@ h1{margin:0;font-size:22px;line-height:1.1;letter-spacing:.02em}
   .controls .btn{min-height:46px}
 }
 @media(max-width:420px){
+  .app{padding-left:10px;padding-right:10px}
+  .board-wrap,.tray-panel{padding:8px}
+  .board{width:min(calc(100vw - 36px),460px)}
   .tray{grid-template-columns:repeat(3,1fr);gap:5px}
   .piece-card{padding:6px 4px 5px;border-radius:14px}
   .mini-cell{width:10px;height:10px}
+  .splash{padding-left:16px;padding-right:16px}
   .splash-title{font-size:38px}
   .splash-logo{font-size:58px}
 }
@@ -165,21 +170,23 @@ h1{margin:0;font-size:22px;line-height:1.1;letter-spacing:.02em}
 
 <!-- ═══ 开始页面 ═══ -->
 <div class="splash" id="splash">
-  <div class="splash-logo">🧩</div>
-  <div class="splash-title">方块游戏</div>
-  <div class="splash-sub">BLOCK PUZZLE</div>
-  <div class="splash-rules">
-    <h3>游戏规则</h3>
-    <ol>
-      <li>拖拽下方方块到棋盘白色区域</li>
-      <li>点击方块可以旋转方向</li>
-      <li>双击已放置的方块可放回</li>
-      <li>填满所有白色区域即可过关</li>
-    </ol>
+  <div class="splash-main">
+    <button class="splash-btn" id="startBtn">开始游戏</button>
+    <div class="splash-logo">🧩</div>
+    <div class="splash-title">方块游戏</div>
+    <div class="splash-sub">BLOCK PUZZLE</div>
+    <div class="splash-rules">
+      <h3>游戏规则</h3>
+      <ol>
+        <li>拖拽下方方块到棋盘白色区域</li>
+        <li>点击方块可以旋转方向</li>
+        <li>双击已放置的方块可放回</li>
+        <li>填满所有白色区域即可过关</li>
+      </ol>
+    </div>
+    <button class="splash-btn" id="continueBtn" style="display:none;margin-top:0;background:linear-gradient(135deg,#8be27f,#6ce6b8);color:#06101a">继续游戏</button>
   </div>
   <div class="splash-author">作者 JasonZhou</div>
-  <button class="splash-btn" id="startBtn">开始游戏</button>
-  <button class="splash-btn" id="continueBtn" style="display:none;margin-top:0;background:linear-gradient(135deg,#8be27f,#6ce6b8);color:#06101a">继续游戏</button>
 </div>
 
 <!-- ═══ 游戏主界面 ═══ -->
@@ -301,7 +308,7 @@ h1{margin:0;font-size:22px;line-height:1.1;letter-spacing:.02em}
       quote: "聚沙成塔，众行致远",
     },
     {
-      name: "第4关", n: 8,
+      name: "第4关", n: 7, m: 8,
       shapeName: "",
       target: [[1,6],[2,1],[2,2],[2,3],[2,4],[2,5],[2,6],[3,2],[3,3],[3,4],[3,5],[3,6],[4,2],[4,3],[4,4],[4,5],[4,6],[5,2],[5,3],[5,5],[5,6]],
       pieceKeys: ["o4","t4","l5","v5","i3"],
@@ -309,7 +316,7 @@ h1{margin:0;font-size:22px;line-height:1.1;letter-spacing:.02em}
       quote: "慢即是快，稳即是远",
     },
     {
-      name: "第5关", n: 10,
+      name: "第5关", n: 9, m: 10,
       shapeName: "",
       target: [[1,6],[1,7],[1,8],[2,5],[2,6],[2,7],[3,1],[3,2],[3,3],[3,4],[3,5],[3,6],[3,7],[4,1],[4,2],[4,3],[4,4],[4,5],[4,6],[5,1],[5,2],[5,3],[5,4],[5,5],[5,6],[6,1],[6,2],[6,3],[6,4],[6,5],[7,2],[7,3],[7,4],[7,5]],
       pieceKeys: ["l5","t5","v5","w5","y5","p5","o4"],
@@ -377,13 +384,14 @@ h1{margin:0;font-size:22px;line-height:1.1;letter-spacing:.02em}
 
   // ── 棋盘尺寸工具 ──
   function getCellSize() {
-    const n = st.def.n;
+    const m = st.def.m || st.def.n;
     const boardW = els.board.clientWidth;
     const gap = 3;
-    return (boardW - (n + 1) * gap) / n;
+    return (boardW - (m + 1) * gap) / m;
   }
   function ptrToCell(px, py) {
     const n = st.def.n;
+    const m = st.def.m || n;
     const rect = els.board.getBoundingClientRect();
     const gap = 3;
     const cs = getCellSize();
@@ -391,7 +399,7 @@ h1{margin:0;font-size:22px;line-height:1.1;letter-spacing:.02em}
     const offY = py - rect.top - gap;
     const col = Math.floor(offX / (cs + gap));
     const row = Math.floor(offY / (cs + gap));
-    if (row < 0 || col < 0 || row >= n || col >= n) return null;
+    if (row < 0 || col < 0 || row >= n || col >= m) return null;
     return { row, col };
   }
   function cellToScreen(row, col) {
@@ -424,9 +432,11 @@ h1{margin:0;font-size:22px;line-height:1.1;letter-spacing:.02em}
   function curCells(pc, r_rot) { return rot(pc.base, r_rot !== undefined ? r_rot : pc.rot); }
   function cellsAt(pc, row, col, r_rot) { return curCells(pc, r_rot).map(([dr,dc]) => [row+dr, col+dc]); }
   function canPlace(pc, row, col) {
+    const n = st.def.n;
+    const m = st.def.m || n;
     return cellsAt(pc, row, col).every(([r,c]) => {
       const k = key(r,c);
-      return r>=0 && c>=0 && r<st.def.n && c<st.def.n && st.target.has(k) && !st.occupied.has(k);
+      return r>=0 && c>=0 && r<n && c<m && st.target.has(k) && !st.occupied.has(k);
     });
   }
   function findPlaceNear(pc, row, col, radius) {
@@ -470,18 +480,36 @@ h1{margin:0;font-size:22px;line-height:1.1;letter-spacing:.02em}
     const d = st.def;
     els.pill.textContent = "LEVEL " + (li + 1);
     els.lvName.textContent = "第 " + (li + 1) + " 关";
-    els.lvSize.textContent = d.n + " × " + d.n;
+    els.lvSize.textContent = d.n + " × " + (d.m || d.n);
     els.left.textContent = Math.max(0, st.target.size - st.occupied.size);
     els.moves.textContent = st.moves;
     els.pieces.textContent = st.pieces.filter(p => !p.placed).length;
     els.undo.disabled = !st.history.length;
   }
+  function fitBoard() {
+    const n = st.def.n;
+    const m = st.def.m || n;
+    const gap = 3;
+    const wrap = els.board.parentElement;
+    let availW = wrap ? wrap.clientWidth : Math.min(window.innerWidth - 52, 460);
+    if (!availW) availW = Math.min(window.innerWidth - 52, 460);
+    availW = Math.min(availW, 460);
+    const cellSize = Math.max(18, Math.floor((availW - (m + 1) * gap) / m));
+    const boardW = cellSize * m + (m + 1) * gap;
+    const boardH = cellSize * n + (n + 1) * gap;
+    els.board.style.width = boardW + "px";
+    els.board.style.height = boardH + "px";
+  }
+  window.addEventListener("resize", () => { if (st) fitBoard(); });
+
   function renderBoard() {
     const n = st.def.n;
+    const m = st.def.m || n;
     els.board.style.setProperty("--n", n);
+    els.board.style.setProperty("--m", m);
     els.board.innerHTML = "";
     for (let r = 0; r < n; r++) {
-      for (let c = 0; c < n; c++) {
+      for (let c = 0; c < m; c++) {
         const d = document.createElement("div");
         d.className = "cell"; d.dataset.r = r; d.dataset.c = c;
         const k = key(r, c);
@@ -493,6 +521,7 @@ h1{margin:0;font-size:22px;line-height:1.1;letter-spacing:.02em}
         els.board.appendChild(d);
       }
     }
+    fitBoard();
   }
 
   // ── 托盘渲染 ──
@@ -597,7 +626,7 @@ h1{margin:0;font-size:22px;line-height:1.1;letter-spacing:.02em}
       gx = ev.clientX - gs.w/2; gy = ev.clientY - gs.h/2;
       if (isTouch) gy -= gs.h + 24;
     }
-    ghost.style.left = gx + "px"; ghost.style.top = gy + "px";
+    ghost.style.left = Math.round(gx) + "px"; ghost.style.top = Math.round(gy) + "px";
     drag = { pc, ghost, source, startX:ev.clientX, startY:ev.clientY,
               offsetX:ev.clientX-gx, offsetY:ev.clientY-gy, lastValid:null };
     ev.target.setPointerCapture(ev.pointerId);
@@ -610,7 +639,7 @@ h1{margin:0;font-size:22px;line-height:1.1;letter-spacing:.02em}
     if (!drag) return; ev.preventDefault();
     const gx = ev.clientX - drag.offsetX;
     const gy = ev.clientY - drag.offsetY;
-    drag.ghost.style.left = gx + "px"; drag.ghost.style.top = gy + "px";
+    drag.ghost.style.left = Math.round(gx) + "px"; drag.ghost.style.top = Math.round(gy) + "px";
     drag.ghost.style.display = "block";
     const pos = ptrToCell(gx, gy);
     if (pos) {
@@ -700,19 +729,19 @@ h1{margin:0;font-size:22px;line-height:1.1;letter-spacing:.02em}
 
   // ── 预览 ──
   function previewAt(row, col, pc) {
-    clearPreview(); const n = st.def.n;
+    clearPreview(); const n = st.def.n; const m = st.def.m || n;
     cellsAt(pc, row, col).forEach(([r,c]) => {
-      if (r>=0 && r<n && c>=0 && c<n) {
-        const d = els.board.children[r*n+c];
+      if (r>=0 && r<n && c>=0 && c<m) {
+        const d = els.board.children[r*m+c];
         if (d) d.classList.add(canPlace(pc,row,col) ? "preview-ok" : "preview-bad");
       }
     });
   }
   function clearPreview() { [...els.board.children].forEach(d => d.classList.remove("preview-ok","preview-bad")); }
   function flashCells(cells) {
-    const n = st.def.n;
+    const m = st.def.m || st.def.n;
     cells.forEach(([r,c]) => {
-      const d = els.board.children[r*n+c];
+      const d = els.board.children[r*m+c];
       if (d) { d.classList.add("drop-flash"); setTimeout(()=>d.classList.remove("drop-flash"), 220); }
     });
   }
@@ -847,7 +876,6 @@ h1{margin:0;font-size:22px;line-height:1.1;letter-spacing:.02em}
     els.splash.classList.remove("hide");
     if (li > 0) {
       els.continueBtn.style.display = "";
-      els.continueBtn.style.order = "-1";
       els.startBtn.textContent = "重新开始";
       els.startBtn.classList.add("secondary");
     } else {
