@@ -566,13 +566,6 @@ h1{margin:0;font-size:22px;line-height:1.1;letter-spacing:.02em}
       }
       els.tray.appendChild(card);
     }
-    st.pieces.forEach(pc => {
-      if (pc.placed) {
-        const card = createPieceCard(pc, 0);
-        card.addEventListener("pointerdown", ev => startDrag(ev, pc, "board"));
-        els.tray.appendChild(card);
-      }
-    });
   }
   function createPieceCard(pc, count) {
     const card = document.createElement("div");
@@ -624,7 +617,8 @@ h1{margin:0;font-size:22px;line-height:1.1;letter-spacing:.02em}
 
   // ── 拖拽逻辑 ──
   function startDrag(ev, pc, source) {
-    if (ev.button !== undefined && ev.button !== 0) return;
+    // 仅在真正按下时过滤非左键；从棋盘 pointermove 触发的重拖事件 button 为 -1，必须放行
+    if (ev.type === "pointerdown" && ev.button !== 0) return;
     ev.preventDefault(); clearHint();
     if (source === "board" && pc.placed) {
       for (const [k, id] of [...st.occupied]) if (id === pc.id) st.occupied.delete(k);
