@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
 <meta name="theme-color" content="#0d1520" />
-<title>方块游戏</title>
+<title>我赌你过不去</title>
 <style>
 :root {
   --bg:#070b12;--panel:#101826;--text:#eaf2ff;--muted:#8a9bb5;
@@ -31,7 +31,7 @@ button{font:inherit;color:inherit}
 .splash.hide{opacity:0;visibility:hidden;pointer-events:none}
 .splash-logo{font-size:72px;line-height:1;filter:drop-shadow(0 0 30px rgba(70,230,208,.45));margin-bottom:2px;animation:float 4.5s ease-in-out infinite}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-.splash-title{font-size:48px;font-weight:900;letter-spacing:.10em;background:linear-gradient(120deg,#eaf2ff 0%,#5aa8ff 46%,#46e6d0 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;line-height:1.25;text-shadow:0 0 40px rgba(70,230,208,.15)}
+.splash-title{font-size:48px;font-weight:900;letter-spacing:.06em;background:linear-gradient(120deg,#eaf2ff 0%,#5aa8ff 46%,#46e6d0 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;line-height:1.25;text-shadow:0 0 40px rgba(70,230,208,.15)}
 .splash-sub{font-size:14px;color:var(--muted);margin-top:-2px;letter-spacing:.34em;text-transform:uppercase}
 .splash-rules{margin:8px 0 2px;background:var(--glass);border:1px solid var(--line);border-radius:22px;padding:20px 24px;max-width:420px;width:100%;backdrop-filter:blur(14px);box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.08)}
 .splash-rules h3{margin:0 0 14px;font-size:16px;color:var(--text);font-weight:700;letter-spacing:.08em;display:flex;align-items:center;gap:8px}
@@ -39,6 +39,8 @@ button{font:inherit;color:inherit}
 .splash-rules ol{margin:0;padding-left:22px;color:var(--muted);font-size:15px;line-height:2.3;letter-spacing:.01em}
 .splash-rules li::marker{color:var(--accent);font-weight:700}
 .splash-author{font-size:13px;color:rgba(255,255,255,.30);letter-spacing:.05em;margin-bottom:4px}
+.splash-actions{display:flex;flex-direction:column;align-items:center;gap:11px;width:100%;padding:0 0 2px}
+.splash-actions .splash-btn{margin-top:0}
 .splash-btn{margin-top:10px;padding:16px 58px;border:0;border-radius:999px;background:linear-gradient(135deg,#46e6d0,#5aa8ff);color:#04121a;font-size:19px;font-weight:800;letter-spacing:.10em;cursor:pointer;box-shadow:0 10px 30px rgba(70,230,208,.30),inset 0 1px 0 rgba(255,255,255,.35);transition:transform .15s ease,box-shadow .15s ease}
 .splash-btn:active{transform:scale(.96);box-shadow:0 4px 14px rgba(70,230,208,.22)}
 .splash-btn.secondary{background:rgba(255,255,255,.06);color:var(--text);border:1px solid var(--line);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
@@ -171,9 +173,23 @@ h1{margin:0;font-size:22px;line-height:1.1;letter-spacing:.02em}
 <!-- ═══ 开始页面 ═══ -->
 <div class="splash" id="splash">
   <div class="splash-main">
-    <button class="splash-btn" id="startBtn">开始游戏</button>
-    <div class="splash-logo">🧩</div>
-    <div class="splash-title">方块游戏</div>
+    <div class="splash-logo">
+      <svg viewBox="0 0 120 120" width="96" height="96" aria-hidden="true">
+        <defs>
+          <linearGradient id="lg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5ff0d6"/><stop offset="1" stop-color="#3fbfa6"/></linearGradient>
+          <linearGradient id="lg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7fb8ff"/><stop offset="1" stop-color="#4f8be8"/></linearGradient>
+          <linearGradient id="lg3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b39bff"/><stop offset="1" stop-color="#8d6ff0"/></linearGradient>
+          <linearGradient id="lg4" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd98a"/><stop offset="1" stop-color="#f5b85e"/></linearGradient>
+        </defs>
+        <g>
+          <rect x="16" y="16" width="36" height="36" rx="11" fill="url(#lg1)"/>
+          <rect x="60" y="16" width="36" height="36" rx="11" fill="url(#lg2)"/>
+          <rect x="16" y="60" width="36" height="36" rx="11" fill="url(#lg3)"/>
+          <rect x="60" y="60" width="36" height="36" rx="11" fill="url(#lg4)"/>
+        </g>
+      </svg>
+    </div>
+    <div class="splash-title">我赌你过不去</div>
     <div class="splash-sub">BLOCK PUZZLE</div>
     <div class="splash-rules">
       <h3>游戏规则</h3>
@@ -184,15 +200,18 @@ h1{margin:0;font-size:22px;line-height:1.1;letter-spacing:.02em}
         <li>填满所有白色区域即可过关</li>
       </ol>
     </div>
+  </div>
+  <div class="splash-actions">
+    <button class="splash-btn" id="startBtn">开始游戏</button>
     <button class="splash-btn" id="continueBtn" style="display:none;margin-top:0;background:linear-gradient(135deg,#8be27f,#6ce6b8);color:#06101a">继续游戏</button>
   </div>
   <div class="splash-author">作者 JasonZhou</div>
 </div>
 
 <!-- ═══ 游戏主界面 ═══ -->
-<main class="app" id="gameApp" style="display:none" aria-label="方块游戏">
+<main class="app" id="gameApp" style="display:none" aria-label="我赌你过不去">
   <header class="topbar">
-    <div><h1>方块游戏</h1><div class="subtitle">拖拽方块到白色区域，点击旋转，双击已放方块放回</div></div>
+    <div><h1>我赌你过不去</h1><div class="subtitle">拖拽方块到白色区域，点击旋转，双击已放方块放回</div></div>
     <div class="pill" id="levelPill">LEVEL 1</div>
   </header>
   <section class="hud">
@@ -300,11 +319,11 @@ h1{margin:0;font-size:22px;line-height:1.1;letter-spacing:.02em}
       quote: "交错之中，自有章法",
     },
     {
-      name: "第3关", n: 9,
+      name: "第3关", n: 8,
       shapeName: "",
-      target: [[1,1],[1,2],[1,3],[2,2],[2,3],[2,4],[2,5],[3,2],[3,3],[4,2],[4,3],[4,4],[4,5],[5,2],[5,3],[5,5],[5,6],[5,7],[5,8],[6,3],[6,4],[6,5],[6,6],[6,8],[7,4],[7,5],[7,6],[7,7],[7,8],[8,7]],
+      target: [[0,0],[0,1],[0,2],[1,1],[1,2],[1,3],[1,4],[2,1],[2,2],[3,1],[3,2],[3,3],[3,4],[4,1],[4,2],[4,4],[4,5],[4,6],[4,7],[5,2],[5,3],[5,4],[5,5],[5,7],[6,3],[6,4],[6,5],[6,6],[6,7],[7,6]],
       pieceKeys: ["l5","t5","v5","w5","y5","u5"],
-      hint: [["l5",1,1,2],["t5",1,3,3],["v5",4,3,2],["w5",5,2,2],["u5",5,6,2],["y5",7,5,3]],
+      hint: [["l5",0,0,2],["t5",0,2,3],["v5",3,2,2],["w5",4,1,2],["u5",4,5,2],["y5",6,4,3]],
       quote: "聚沙成塔，众行致远",
     },
     {
